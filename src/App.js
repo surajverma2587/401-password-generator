@@ -1,3 +1,9 @@
+import { Banner } from "./components/Banner";
+
 export const App = () => {
-  return <div>App</div>;
+  return (
+    <div>
+      <Banner />
+    </div>
+  );
 };
