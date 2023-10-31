@@ -7,13 +7,27 @@ import Divider from "@mui/material/Divider";
 import FormGroup from "@mui/material/FormGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
+import FormLabel from "@mui/material/FormLabel";
 import Grid from "@mui/material/Grid";
+import FormControl from "@mui/material/FormControl";
 import Button from "@mui/material/Button";
 import Paper from "@mui/material/Paper";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 
-export const PasswordGeneratorForm = () => {
+export const PasswordGeneratorForm = ({ onSuccess }) => {
+  const validateCheckbox = (value) => {
+    const keys = ["isLowercase", "isUppercase", "isNumeric", "isSymbol"];
+
+    const valuesArray = keys.map((key) => {
+      return formik.values[key];
+    });
+
+    const filteredArray = valuesArray.filter((e) => e);
+
+    return filteredArray.length >= 2;
+  };
+
   const initialValues = {
     passwordLength: "",
     isLowercase: false,
@@ -27,14 +41,14 @@ export const PasswordGeneratorForm = () => {
       .required("Please enter a valid number.")
       .min(8, "Please enter a password length of minimum 8 characters.")
       .max(100, "Please enter a password length of maximum 100 characters."),
-    isLowercase: false,
-    isUppercase: false,
-    isNumeric: false,
-    isSymbol: false,
+    isLowercase: Yup.boolean().test("isLowercase", validateCheckbox),
+    isUppercase: Yup.boolean().test("isUppercase", validateCheckbox),
+    isNumeric: Yup.boolean().test("isNumeric", validateCheckbox),
+    isSymbol: Yup.boolean().test("isSymbol", validateCheckbox),
   });
 
   const onSubmit = (values) => {
-    console.log(values);
+    onSuccess(values);
   };
 
   const formik = useFormik({ initialValues, validationSchema, onSubmit });
@@ -57,8 +71,12 @@ export const PasswordGeneratorForm = () => {
               name="passwordLength"
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
-              error={!!formik.errors.passwordLength}
-              helperText={formik.errors.passwordLength}
+              error={
+                !!formik.errors.passwordLength && formik.touched.passwordLength
+              }
+              helperText={
+                formik.touched.passwordLength && formik.errors.passwordLength
+              }
             />
 
             <Stack spacing={2}>
@@ -70,60 +88,98 @@ export const PasswordGeneratorForm = () => {
                 <Divider />
               </Box>
               <FormGroup>
-                <Grid container spacing={2}>
-                  <Grid item xs={6}>
-                    <Stack>
-                      <FormControlLabel
-                        control={
-                          <Checkbox
-                            checked={formik.values.isLowercase}
-                            name="isLowercase"
-                            onChange={formik.handleChange}
-                            onBlur={formik.handleBlur}
-                          />
-                        }
-                        label="Lowercase"
-                      />
-                      <FormControlLabel
-                        control={
-                          <Checkbox
-                            checked={formik.values.isUppercase}
-                            name="isUppercase"
-                            onChange={formik.handleChange}
-                            onBlur={formik.handleBlur}
-                          />
-                        }
-                        label="Uppercase"
-                      />
-                    </Stack>
+                <FormControl
+                  required
+                  error={true}
+                  component="fieldset"
+                  variant="standard"
+                >
+                  <FormLabel component="legend" sx={{ fontSize: "12px" }}>
+                    Pick two
+                  </FormLabel>
+                  <Grid container spacing={2}>
+                    <Grid item xs={6}>
+                      <Stack>
+                        <FormControlLabel
+                          control={
+                            <Checkbox
+                              checked={formik.values.isLowercase}
+                              name="isLowercase"
+                              onChange={formik.handleChange}
+                              onBlur={formik.handleBlur}
+                              sx={{
+                                color:
+                                  formik.touched.isLowercase &&
+                                  formik.errors.isLowercase
+                                    ? "#d32f2f"
+                                    : undefined,
+                              }}
+                            />
+                          }
+                          label="Lowercase"
+                        />
+                        <FormControlLabel
+                          control={
+                            <Checkbox
+                              checked={formik.values.isUppercase}
+                              name="isUppercase"
+                              onChange={formik.handleChange}
+                              onBlur={formik.handleBlur}
+                              sx={{
+                                color:
+                                  formik.touched.isUppercase &&
+                                  formik.errors.isUppercase
+                                    ? "#d32f2f"
+                                    : undefined,
+                              }}
+                            />
+                          }
+                          label="Uppercase"
+                        />
+                      </Stack>
+                    </Grid>
+                    <Grid item xs={6}>
+                      <Stack>
+                        <FormControlLabel
+                          control={
+                            <Checkbox
+                              checked={formik.values.isNumeric}
+                              name="isNumeric"
+                              onChange={formik.handleChange}
+                              onBlur={formik.handleBlur}
+                              sx={{
+                                color:
+                                  formik.touched.isNumeric &&
+                                  formik.errors.isNumeric
+                                    ? "#d32f2f"
+                                    : undefined,
+                              }}
+                            />
+                          }
+                          label="Numeric"
+                        />
+                        <FormControlLabel
+                          control={
+                            <Checkbox
+                              checked={formik.values.isSymbol}
+                              name="isSymbol"
+                              onChange={formik.handleChange}
+                              onBlur={formik.handleBlur}
+                              sx={{
+                                color:
+                                  formik.touched.isSymbol &&
+                                  formik.errors.isSymbol
+                                    ? "#d32f2f"
+                                    : undefined,
+                              }}
+                            />
+                          }
+                          label="Symbols"
+                        />
+                      </Stack>
+                    </Grid>
                   </Grid>
-                  <Grid item xs={6}>
-                    <Stack>
-                      <FormControlLabel
-                        control={
-                          <Checkbox
-                            checked={formik.values.isNumeric}
-                            name="isNumeric"
-                            onChange={formik.handleChange}
-                            onBlur={formik.handleBlur}
-                          />
-                        }
-                        label="Numeric"
-                      />
-                      <FormControlLabel
-                        control={
-                          <Checkbox
-                            checked={formik.values.isSymbol}
-                            name="isSymbol"
-                            onChange={formik.handleChange}
-                            onBlur={formik.handleBlur}
-                          />
-                        }
-                        label="Symbols"
-                      />
-                    </Stack>
-                  </Grid>
-                </Grid>
+                </FormControl>
               </FormGroup>
             </Stack>
 
